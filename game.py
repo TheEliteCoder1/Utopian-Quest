@@ -38,17 +38,18 @@ coin_fx.set_volume(0.5)
 explosive_fx = pygame.mixer.Sound('assets/music/explosive.wav')
 explosive_fx.set_volume(2)
 
+
 class Player(pygame.sprite.Sprite):
 	def __init__(self, screen, x, y, character, scale, speed):
 		pygame.sprite.Sprite.__init__(self)
 		self.alive = True
 		self.speed = speed
 		self.shoot_cooldown = 0
-		self.health = 100
-		self.max_health = self.health
 		self.direction = 1
+		self.hearts = 3
 		self.vel_y = 0
 		self.jump = False
+		self.react_to_explosion = False
 		self.in_air = True
 		self.flip = False
 		self.animation_list = []
@@ -106,6 +107,10 @@ class Player(pygame.sprite.Sprite):
 			self.vel_y = -7
 			self.jump = False
 			self.in_air = True
+		if self.react_to_explosion == True and self.in_air == False:
+			self.vel_y = -11
+			self.react_to_explosion = False
+			self.in_air = True
 
 		#apply gravity
 		self.vel_y += GRAVITY*2
@@ -137,6 +142,8 @@ class Player(pygame.sprite.Sprite):
 			elif tile[2] == 'Explodable':
 				if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height) or tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 					explosive_fx.play()
+					self.react_to_explosion = True
+					self.hearts -= 1
 					world.objects_list.remove(tile)
 
 
@@ -151,7 +158,7 @@ class Player(pygame.sprite.Sprite):
 
 		#check if fallen off the map
 		if self.rect.bottom > screen_height:
-			self.health = 0
+			self.hearts = 0
 
 
 		#check if going off the edges of the screen
@@ -197,7 +204,7 @@ class Player(pygame.sprite.Sprite):
 
 
 	def check_alive(self):
-		if self.health <= 0:
+		if self.hearts <= 0:
 			self.health = 0
 			self.speed = 0
 			self.alive = False
@@ -253,7 +260,6 @@ class World():
 			for x, tile in enumerate(row):
 				if tile >= 0:
 					img = pygame.transform.scale(pygame.image.load(LEVEL_OBJECTS[tile]["image"]), LEVEL_OBJECTS[tile]["size"])
-					print(LEVEL_OBJECTS[tile]["image"])
 					img_rect = img.get_rect()
 					img_rect.x = x * TILE_SIZE
 					img_rect.y = y * TILE_SIZE
@@ -324,6 +330,13 @@ while running:
 	world.draw()
 	player.update()
 	player.draw()
+	draw_text(screen, FONTS['game_info'], "LEVEL: " + str(level), 30, (255, 213, 128), (75, screen_constants['margin_y']-30))
+	try:
+		for x in range(player.hearts):
+			img = pygame.transform.smoothscale(pygame.image.load("assets/images/heart.png"), (30, 30))
+			screen.blit(img, (x*30+500, 5))
+	except:
+		pass
 	if player.alive:
 		if player.in_air:
 			player.update_action(2)#2: jump
@@ -333,5 +346,17 @@ while running:
 			player.update_action(0)#0: idle
 		screen_scroll, level_complete = player.move(moving_left, moving_right)
 		bg_scroll -= screen_scroll
+	else:
+		bg_scroll = 0
+		world_data = reset_level()
+		#load in level data and create world
+		with open(f'levels/{level}.csv', newline='') as csvfile:
+			reader = csv.reader(csvfile, delimiter=',')
+			for x, row in enumerate(reader):
+				for y, tile in enumerate(row):
+					world_data[x][y] = int(tile)
+		world = World()
+		world.process_data(world_data)
+		player = Player(screen, 30, 0, "Boro", 0.5, 5)
 		
 	pygame.display.update()
