@@ -17,7 +17,7 @@ FONTS = {
 LEVEL_OBJECTS = {
     0:{
         "image":"assets/levelObjects/grass.png",
-        "descriptor":"Decor",
+        "descriptor":"Block",
         "animation":None,
         "size":(35, 35)
     },
@@ -41,13 +41,13 @@ LEVEL_OBJECTS = {
     },
     4:{
         "image":"assets/levelObjects/dark_brick.png",
-        "descriptor":"Decor",
+        "descriptor":"Block",
         "animation":None,
         "size":(35, 35)
     },
     5:{
         "image":"assets/levelObjects/light_brick.png",
-        "descriptor":"Decor",
+        "descriptor":"Block",
         "animation":None,
         "size":(35, 35)
     },
@@ -65,31 +65,31 @@ LEVEL_OBJECTS = {
     },
     8:{
         "image":"assets/levelObjects/bat.png",
-        "descriptor":"Decor",
+        "descriptor":"Enemy",
         "animation":None,
         "size":(35, 35)
     },
     9:{
         "image":"assets/levelObjects/coinGold.png",
-        "descriptor":"Decor",
+        "descriptor":"Currency",
         "animation":None,
         "size":(35, 35)
     },
     10:{
         "image":"assets/levelObjects/bee.png",
-        "descriptor":"Decor",
+        "descriptor":"Enemy",
         "animation":None,
         "size":(35, 35)
     },
     11:{
         "image":"assets/levelObjects/gemBlue.png",
-        "descriptor":"Decor",
+        "descriptor":"Currency",
         "animation":None,
         "size":(35, 35)
     },
     12:{
         "image":"assets/levelObjects/shieldGold.png",
-        "descriptor":"Decor",
+        "descriptor":"Healer",
         "animation":None,
         "size":(35, 35)
     },
@@ -101,50 +101,18 @@ LEVEL_OBJECTS = {
     },
     14:{
         "image":"assets/levelObjects/keyRed.png",
-        "descriptor":"Decor",
+        "descriptor":"Goal",
         "animation":None,
         "size":(35, 35)
     },
     15:{
         "image":"assets/levelObjects/bomb.png",
-        "descriptor":"Decor",
+        "descriptor":"Explodable",
         "animation":None,
         "size":(35, 35)
     },
 }
 
-PLAYERS = {
-    "Yoro": {
-        # sorted -> animation order: i.e, [...]/walking/p1_01 then [...]/walking/p1_02     
-        "walking":sorted(["assets/player/p1/walking/"+f for f in os.listdir("assets/player/p1/walking") if os.path.isfile(os.path.join("assets/player/p1/walking", f))]),
-        # all extras
-        "extras":sorted(["assets/player/p1/extras/"+f for f in os.listdir("assets/player/p1/extras") if os.path.isfile(os.path.join("assets/plater/p1/extras", f))]),
-        # individual extras
-        "hurt":"assets/player/p1/extras/p1_hurt.png",
-        "duck":"assets/player/p1/extras/p1_duck.png",
-        "front":"assets/player/p1/extras/p1_front.png",
-        "jump":"assets/player/p1/extras/p1_jump.png",
-        "stand":"assets/player/p1/extras/p1_stand.png"
-    },
-    "Higo": {
-        "walking":sorted(["assets/player/p2/walking/"+f for f in os.listdir("assets/player/p2/walking") if os.path.isfile(os.path.join("assets/player/p2/walking", f))]),
-        "extras":sorted(["assets/player/p2/extras/"+f for f in os.listdir("assets/player/p2/extras") if os.path.isfile(os.path.join("assets/plater/p2/extras", f))]),
-        "hurt":"assets/player/p2/extras/p2_hurt.png",
-        "duck":"assets/player/p2/extras/p2_duck.png",
-        "front":"assets/player/p2/extras/p2_front.png",
-        "jump":"assets/player/p2/extras/p2_jump.png",
-        "stand":"assets/player/p2/extras/p2_stand.png"
-    },
-    "Parto": {
-        "walking":sorted(["assets/player/p3/walking/"+f for f in os.listdir("assets/player/p3/walking") if os.path.isfile(os.path.join("assets/player/p3/walking", f))]),
-        "extras":sorted(["assets/player/p3/extras/"+f for f in os.listdir("assets/player/p3/extras") if os.path.isfile(os.path.join("assets/plater/p3/extras", f))]),
-        "hurt":"assets/player/p3/extras/p3_hurt.png",
-        "duck":"assets/player/p3/extras/p3_duck.png",
-        "front":"assets/player/p3/extras/p3_front.png",
-        "jump":"assets/player/p3/extras/p3_jump.png",
-        "stand":"assets/player/p3/extras/p3_stand.png"
-    }
-}
 
 def draw_text(screen: pygame.Surface, font_file: str, text: str, 
     font_size: int, color: tuple, pos: tuple, backg=None):
