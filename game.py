@@ -5,8 +5,10 @@ pygame.init()
 pygame.mixer.init()
 
 
-screen_width, screen_height = 600, 500
-screen = pygame.display.set_mode((600, 500))
+screen_width, screen_height = 700, 500
+screen = pygame.display.set_mode((700, 500))
+pygame.display.set_caption("Utopian Quest")
+pygame.display.set_icon(pygame.image.load("game_icon.png"))
 screen_constants = get_usefull_constants(screen)
 running = True
 fps = 30
@@ -36,8 +38,10 @@ coin_fx = pygame.mixer.Sound('assets/music/coin.mp3')
 coin_fx.set_volume(0.5)
 
 explosive_fx = pygame.mixer.Sound('assets/music/explosive.wav')
-explosive_fx.set_volume(2)
+explosive_fx.set_volume(0.5)
 
+death_fx = pygame.mixer.Sound('assets/music/death.mp3')
+death_fx.set_volume(0.5)
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self, screen, x, y, character, scale, speed):
@@ -119,6 +123,7 @@ class Player(pygame.sprite.Sprite):
 		dy += self.vel_y
 
 		#check for collision
+		level_complete = False
 		for tile in world.objects_list:
 			if tile[2] == 'Block':
 				#check collision in the x direction
@@ -145,16 +150,14 @@ class Player(pygame.sprite.Sprite):
 					self.react_to_explosion = True
 					self.hearts -= 1
 					world.objects_list.remove(tile)
+			elif tile[2] == 'Goal':
+				if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height) or tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+					level_complete = True
 
 
 		# #check for collision with water
 		# if pygame.sprite.spritecollide(self, water_group, False):
 		# 	self.health = 0
-
-		#check for collision with exit
-		level_complete = False
-		# if pygame.sprite.spritecollide(self, exit_group, False):
-		# 	level_complete = True
 
 		#check if fallen off the map
 		if self.rect.bottom > screen_height:
@@ -209,6 +212,7 @@ class Player(pygame.sprite.Sprite):
 			self.speed = 0
 			self.alive = False
 			self.update_action(3)
+			death_fx.play()
 
 
 	def draw(self):
@@ -227,25 +231,6 @@ def draw_bg(screen, background):
 	width = background.get_width()
 	for x in range(5):
 		screen.blit(background, ((x * width) - bg_scroll * 0.5, 0))
-
-
-def reset_level():
-	# enemy_group.empty()
-	# bullet_group.empty()
-	# grenade_group.empty()
-	# explosion_group.empty()
-	# item_box_group.empty()
-	# decoration_group.empty()
-	# water_group.empty()
-	# exit_group.empty()
-
-	# create empty tile list
-	data = []
-	for row in range(ROWS):
-		r = [-1] * COLS
-		data.append(r)
-
-	return data
 
 
 class World():
@@ -334,7 +319,7 @@ while running:
 	try:
 		for x in range(player.hearts):
 			img = pygame.transform.smoothscale(pygame.image.load("assets/images/heart.png"), (30, 30))
-			screen.blit(img, (x*30+500, 5))
+			screen.blit(img, (x*30+600, 5))
 	except:
 		pass
 	if player.alive:
@@ -346,9 +331,33 @@ while running:
 			player.update_action(0)#0: idle
 		screen_scroll, level_complete = player.move(moving_left, moving_right)
 		bg_scroll -= screen_scroll
+		if level_complete:
+			level += 1
+			bg_scroll = 0
+
+			pygame.mixer.music.stop()
+			pygame.mixer.music.play()
+			world_data = []
+			for row in range(ROWS):
+				r = [-1] * COLS
+				world_data.append(r)
+			#load in level data and create world
+			with open(f'levels/{level}.csv', newline='') as csvfile:
+				reader = csv.reader(csvfile, delimiter=',')
+				for x, row in enumerate(reader):
+					for y, tile in enumerate(row):
+						world_data[x][y] = int(tile)
+			world = World()
+			world.process_data(world_data)
+			player = Player(screen, 30, 0, "Boro", 0.5, 5)
 	else:
 		bg_scroll = 0
-		world_data = reset_level()
+		pygame.mixer.music.stop()
+		pygame.mixer.music.play()
+		world_data = []
+		for row in range(ROWS):
+			r = [-1] * COLS
+			world_data.append(r)
 		#load in level data and create world
 		with open(f'levels/{level}.csv', newline='') as csvfile:
 			reader = csv.reader(csvfile, delimiter=',')

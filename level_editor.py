@@ -11,7 +11,7 @@ screen_width = 700
 screen_height = 500
 screen = pygame.display.set_mode((screen_width+side_panel, screen_height+bottom_panel))
 pygame.display.set_caption("Level Editor")
-pygame.display.set_icon(pygame.image.load("icon.png"))
+pygame.display.set_icon(pygame.image.load("editor_icon.png"))
 screen_constants = get_usefull_constants(screen)
 running = True
 fps = 60
