@@ -1,2 +1,2 @@
-# Pygame-Project
+# Utopian Quest
 A cool game.
